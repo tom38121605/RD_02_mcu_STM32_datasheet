@@ -6,6 +6,8 @@
 
 参考2.  NVIC->IP 和 NVIC->IPR的区别
     NVIC->IP      //STM32C011, M0,    __STM32开发指南-寄存器版本_V1.3_sistick_gd_ok.pdf  P106
+                           (注意： C011里面的IP寄存器是32位的，那里的一个IP寄存器等于这里的4个IP寄存器)
+
     NVIC->IPR    //STM32H503, M33,  00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P220
 
 
