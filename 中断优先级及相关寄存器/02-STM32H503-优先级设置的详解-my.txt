@@ -1,0 +1,58 @@
+﻿
+
+
+参考1. 时钟优先级和 irq设置的参考书籍：  
+    AIRCR  -- P103, P107       //优先级分组。__STM32开发指南-寄存器版本_V1.3_sistick_gd_ok.pdf  P103 P107（不论是抢占优先级还是子优先级，都是数值越小优先级越高）
+    NVIC->IPR[ 27 ] = 0;       //优先级和子优先级。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P223 (主要看高4位)
+    NVIC->ISER[ 0] =  1 << 27; //使能irq。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P220  
+
+说明1：分组值的取得和计算：取得分组寄存器AIRCR.10-8的值为0(在STM32H503中，AIRCR.10-8的值为0相当于值为4)
+          值为4查表对应优先级分组为3，ISER中前3位抢占优先级和1位子优先级  //__STM32开发指南  P107
+
+
+----------------------------示例：dma1的优先级设置----------------------------------------------------
+
+
+  // 设置H503的优先级分组的值为3（第四组，3位抢占优先级和1位子优先级） //默认值
+     设置dma1通道0的抢占优先级和子优先级都设为0（最高）
+  NVIC_SetPriority(GPDMA1_Channel0_IRQn, NVIC_EncodePriority(NVIC_GetPriorityGrouping(),0, 0));
+
+     AAA = NVIC_GetPriorityGrouping();         
+     AAA = (uint32_t)((SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) >> SCB_AIRCR_PRIGROUP_Pos);
+     AAA = (SCB->AIRCR & (7<<8) ) >> 7;
+     AAA = AIRCR.10-8 = 0;                    //复位值为0，注意优先级分组在下面重新计算   //__STM32开发指南-寄存器版本_V1.3_sistick_gd_ok.pdf  P103 P107
+
+     BBB = NVIC_EncodePriority( AAA, 0, 0);    //0
+
+     //NVIC_SetPriority(GPDMA1_Channel0_IRQn, BBB );
+        NVIC->IPR[27] = 0<<4;  //IPR[27].7-5, 4=000, 0             //高4位中，前3位bit7-5抢占优先级和1位bit4子优先级，0是最高的
+
+
+--------------
+
+说明1：分组值的取得和计算：取得分组寄存器AIRCR.10-8的值为0(在STM32H503中，AIRCR.10-8的值为0相当于值为4)
+          值为4查表对应优先级分组为3，ISER中前3位抢占优先级和1位子优先级  //__STM32开发指南  P107
+
+//AAA=0, 0, 0
+NVIC_EncodePriority (  PriorityGroup,   PreemptPriority,  SubPriority)
+ 
+  //取得默认的临时分组值为0
+  PriorityGroupTmp =  0;  //临时分组编号为0  （需根据临时编号计算出优先级分组）
+
+  //根据临时分组值0，计算得H503的分组值为4 (查表对应优先级分组为3，ISER中前3位抢占优先级和1位子优先级)
+  //PreemptPriorityBits = ((7  - 0) >   __NVIC_PRIO_BITS)  ?   __NVIC_PRIO_BITS  :  (7  - 0);  //__NVIC_PRIO_BITS=4
+       PreemptPriorityBits =__NVIC_PRIO_BITS =4;     //查表对应优先级分组为3，ISER中前3位抢占优先级和1位子优先级  //__STM32开发指南  P107
+
+  //SubPriorityBits = ((PriorityGroupTmp + __NVIC_PRIO_BITS ) < 7 ) ? 0 : (PriorityGroupTmp - 7 ) + __NVIC_PRIO_BITS;
+     SubPriorityBits = 0;    
+
+
+   //AAA =  (  PreemptPriority &  ( (1 <<  PreemptPriorityBits ) - 1 ) ) << SubPriorityBits 
+      AAA =  ( 0 &  ( 1<<4 - 1 ) ) << 0  = 0 & 15 =0;
+
+   //BBB =  ((SubPriority  & ((1 << (SubPriorityBits )) - 1 )))
+      BBB = 0 & ( 1<<0 - 1 )  = 0 & 0 =0;
+
+  return ( AAA | BBB );  //0
+
+
