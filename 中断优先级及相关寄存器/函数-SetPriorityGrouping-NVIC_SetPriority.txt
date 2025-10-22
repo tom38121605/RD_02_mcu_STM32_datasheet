@@ -3,6 +3,7 @@
     AIRCR  -- P103, P107       //优先级分组。__STM32开发指南-寄存器版本_V1.3_sistick_gd_ok.pdf  P103 P107（不论是抢占优先级还是子优先级，都是数值越小优先级越高）
     NVIC->IPR[ 27 ] = 0;       //优先级和子优先级。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P223 (主要看高4位)
     NVIC->ISER[ 0] =  1 << 27; //使能irq。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P220  
+    NVIC->ICER[ 0] =  1 << 27; //不使能irq。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P220  
 
 参考2.  NVIC->IP 和 NVIC->IPR的区别
     NVIC->IP      //STM32C011, M0,    __STM32开发指南-寄存器版本_V1.3_sistick_gd_ok.pdf  P106

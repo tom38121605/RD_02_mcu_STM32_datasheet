@@ -3,6 +3,7 @@
 参考1. 时钟优先级和 irq设置的参考书籍：    //H503
 
     NVIC->ISER[ 0] =  1 << 27; //使能irq。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P220  
+    NVIC->ICER[ 0] =  1 << 27; //不使能irq。 00-DUI0553-Cortex-M4 Devices Generic UserGuide     P219 P220  
 
 
 
