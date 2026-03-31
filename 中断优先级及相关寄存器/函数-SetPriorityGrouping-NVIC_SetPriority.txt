@@ -86,11 +86,10 @@ uint32_t NVIC_EncodePriority (  PriorityGroup, PreemptPriority,   SubPriority)
     //SubPriorityBits     = ( (PriorityGroupTmp +  __NVIC_PRIO_BITS ) < 7 ) ?  0  : ( (PriorityGroupTmp - 7 ) + __NVIC_PRIO_BITS) ;
           SubPriorityBits     =    (PriorityGroupTmp - 7 ) + __NVIC_PRIO_BITS = （5-7 ） + 4 =2 ;
 
-
      //iPriorsub  =   SubPriority  & ( (1  << SubPriorityBits ) - 1 )；
           iPriorsub  =   1  & ( (1  << 2 ) - 1 )=1；   //说明：  (1  << 2 ) - 1  是最大位数的掩码，如最大位数是2，则掩码是0b11，如是3，在掩码是0b111
 
-     //iPrior =   ( PreemptPriority & ( (1  << PreemptPriorityBits) - 1 ) )  << SubPriorityBits；
+    //iPrior =   ( PreemptPriority & ( (1  << PreemptPriorityBits) - 1 ) )  << SubPriorityBits；
           iPrior =   ( 3 & ( (1  << 2) - 1 )  )  << 2 = 3<<2；
 
    //return  iPrior  | iPriorsub；
